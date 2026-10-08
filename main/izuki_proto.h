@@ -1,8 +1,9 @@
 /*
- * Izuki JS BLE-HID control protocol (v1).
+ * Izuki JS BLE-HID control protocol (v2).
  *
- * Mirrors docs/BLE_HID_PROTOCOL.md from the Android app. All multi-byte
- * integers are little-endian.
+ * Mirrors docs/BLE_HID_PROTOCOL.md in the Android app repo
+ * (https://github.com/BUGJI/IzukiJS). All multi-byte integers are
+ * little-endian.
  */
 #ifndef IZUKI_PROTO_H_
 #define IZUKI_PROTO_H_

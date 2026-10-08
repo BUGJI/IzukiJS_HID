@@ -1,12 +1,13 @@
 # IzukiJS_HID
 
-使用 **ESP32-C3** 为 [Izuki JS](https://github.com/BUGJI) Android App 开发的
+使用 **ESP32-C3** 为 [Izuki JS](https://github.com/BUGJI/IzukiJS) Android App 开发的
 BLE-HID 固件（虚拟触摸屏 + 键盘）。手机连接后，App 通过自定义 GATT 通道下发
 指令，固件在手机侧注入触摸 / 键盘事件，可用于自动化操作、远程控制等场景。
 
 ## 特性
 
-- **BLE HID 设备**：同时暴露单点多点触控**触摸屏**（绝对坐标）和 **6KRO 键盘**。
+- **BLE HID 设备**：同时暴露单触点多点触控**触摸屏**（绝对坐标 `0..32767`，单 contact）
+  和 **6KRO 键盘**。
 - **自定义 GATT 控制通道**：App → 固件下发指令，固件 → App 上报状态与错误。
 - **复杂手势轨迹**：支持带时间戳的路径插值、曲线、滑到终点后按住（长按）。
 - **文本输入**：将 ASCII 字符串转换为 HID 按键序列。
@@ -31,7 +32,9 @@ idf.py set-target esp32c3
 idf.py build
 ```
 
-Windows 下可直接使用仓库内的 `build.bat`（内部调用 `export.bat` 后转发 `idf.py`）：
+Windows 下可使用仓库内的 `build.bat`（转发给 `idf.py` 前会清掉 Git Bash 设置的
+`MSYSTEM`）。脚本先按 `IDF_PATH` 环境变量定位 `export.bat`，未设置时回退到
+`%USERPROFILE%\esp\esp-idf`，可按本机实际安装位置调整脚本或设置 `IDF_PATH`：
 
 ```bat
 build.bat build
@@ -101,7 +104,7 @@ X/Y 逻辑范围为 `0..32767`。报告 ID 1 使用 `Touch Screen` + `Contact Id
 
 | 指令 | 值 | 负载 |
 | --- | --- | --- |
-| `CMD_HANDSHAKE` | `0x01` | 无 |
+| `CMD_HANDSHAKE` | `0x01` | `ver:u8`（固件当前忽略该字节，仅用于兼容 App 侧握手帧） |
 | `CMD_SET_RESOLUTION` | `0x02` | `w:u16, h:u16` |
 | `CMD_TAP` | `0x03` | `x:u16, y:u16, duration:u16` |
 | `CMD_SWIPE` | `0x04` | `x1:u16, y1:u16, x2:u16, y2:u16, duration:u16, steps:u8` |
@@ -144,10 +147,13 @@ X/Y 逻辑范围为 `0..32767`。报告 ID 1 使用 `Touch Screen` + `Contact Id
 
 ```
 .
+├── .github/workflows/      # CI：ESP-IDF 容器内构建并产出固件 artifact
 ├── CMakeLists.txt          # 顶层工程定义
 ├── build.bat               # Windows 编译辅助脚本
 ├── partitions.csv          # 分区表（4MB，单 factory 分区）
 ├── sdkconfig.defaults      # 默认 Kconfig（NimBLE / HID / 安全）
+├── CHANGELOG.md            # 版本变更记录
+├── LICENSE                 # MIT
 └── main/
     ├── main.c              # 启动流程 + HID 报告描述符
     ├── izuki_ble.c/.h      # 自定义 GATT 服务、广播、配对与安全
@@ -167,4 +173,4 @@ X/Y 逻辑范围为 `0..32767`。报告 ID 1 使用 `Touch Screen` + `Contact Id
 
 ## License
 
-MIT
+[MIT](LICENSE)

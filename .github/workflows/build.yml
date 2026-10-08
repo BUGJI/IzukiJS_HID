@@ -1,0 +1,43 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - LICENSE
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: idf.py build (esp32c3)
+    runs-on: ubuntu-latest
+    container:
+      image: espressif/idf:release-v5.4
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build firmware
+        shell: bash
+        run: |
+          . "$IDF_PATH/export.sh"
+          idf.py set-target esp32c3
+          idf.py build
+
+      - name: Report size
+        shell: bash
+        run: |
+          . "$IDF_PATH/export.sh"
+          idf.py size
+
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: IzukiJS_HID-esp32c3
+          if-no-files-found: error
+          path: |
+            build/bootloader/bootloader.bin
+            build/partition_table/partition-table.bin
+            build/Izuki_js_hid.bin

@@ -1,0 +1,21 @@
+# ESP-IDF build output
+/build/
+*.bin
+*.elf
+*.map
+
+# Generated config (source of truth is sdkconfig.defaults)
+/sdkconfig
+/sdkconfig.old
+
+# Editor / tooling caches
+/.cache/
+/.clangd/
+compile_commands.json
+
+# OS / misc
+nul
+.DS_Store
+Thumbs.db
+*.pyc
+__pycache__/
